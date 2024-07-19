@@ -1,17 +1,24 @@
 const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/authController");
-const jobController = require("../controllers/jobController");
-//const authMiddleware = require("../middleware/authMiddleware");
+const authMiddleware = require("../middleware/authMiddleware");
 
-// User registration
+// Register User
 router.post("/register", authController.register);
 
-// User login
+// Login User
 router.post("/login", authController.login);
 
-// Create a job
-router.post("/job", jobController.createJob);
+// Get User Profile
+router.get("/profile", authMiddleware, authController.getProfile);
 
+// Update User Profile
+router.put("/profile", authMiddleware, authController.updateProfile);
+
+// Toggle Save/Unsave Job
+router.post("/save/:jobId", authMiddleware, authController.toggleSaveJob);
+
+// Get Saved Jobs
+router.get("/saved", authMiddleware, authController.getSavedJobs);
 
 module.exports = router;
