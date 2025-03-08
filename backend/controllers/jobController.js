@@ -4,7 +4,7 @@ const Job = require("../models/job");
 exports.createJob = async (req, res) => {
   try {
     const { title, description, location, salary } = req.body;
-    const job = new Job({ title, description, location, salary/*, employer: req.user.id*/ });
+    const job = new Job({ title, description, location, salary, employer: req.user.id });
     const jobb=await job.save();
     console.log(jobb);
     res.status(201).json(job);

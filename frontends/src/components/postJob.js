@@ -18,17 +18,26 @@ const PostJob = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      //const token = localStorage.getItem("token");
-      const res=await axios.post("http://localhost:5000/api/auth/job",formData/*,
+      const token = localStorage.getItem("token");
+      console.log("Token:", token);
+      if (!token) {
+        alert("You must be logged in to post a job.");
+        navigate("/login");
+        return;
+      }
+
+       await axios.post(
+        "http://localhost:5000/api/auth/job",
+        formData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }*/
+        }
       );
-      localStorage.getItem("token",res.data.token);
+  //localStorage.setItem("token",res.data.token);
       alert("Job posted successfully!");
-      navigate("/"); // Redirect to home page after posting
+      navigate("/");
     } catch (err) {
       console.error(err.response?.data?.message || "Failed to post job");
     }
