@@ -18,16 +18,15 @@ const PostJob = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem("token");
-      await axios.post(
-        "http://localhost:5000/api/jobs",
-        formData,
+      //const token = localStorage.getItem("token");
+      const res=await axios.post("http://localhost:5000/api/auth/job",formData/*,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        }*/
       );
+      localStorage.getItem("token",res.data.token);
       alert("Job posted successfully!");
       navigate("/"); // Redirect to home page after posting
     } catch (err) {

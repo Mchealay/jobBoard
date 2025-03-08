@@ -1,17 +1,15 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const Navbar = ({ isAuthenticated, userRole }) => {
-    return (
-      <nav>
-        <Link to="/">Home</Link>
-        {isAuthenticated && userRole === "employer" && (
-          <Link to="/post-job">Post Job</Link>
-        )}
-        {!isAuthenticated && <Link to="/login">Login</Link>}
-        {!isAuthenticated && <Link to="/signup">Sign Up</Link>}
-      </nav>
-    );
-  };
+const Navbar = () => {
+  return (
+    <nav>
+      <Link to="/">Home</Link>
+      <Link to="/login">Login</Link>
+      <Link to="/signup">Sign Up</Link> 
+      <Link to="/postjob">Post Job</Link>
+    </nav>
+  );
+};
 
 export default Navbar;

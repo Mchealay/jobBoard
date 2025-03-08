@@ -4,7 +4,7 @@ const jobController = require("../controllers/jobController");
 const authMiddleware = require("../middleware/authMiddleware");
 
 // Create a job
-router.post("/", authMiddleware, jobController.createJob);
+router.post("/job", authMiddleware, jobController.createJob);
 
 // Get all jobs
 router.get("/", jobController.getJobs);

@@ -73,4 +73,4 @@ const SignUp = () => {
   );
 };
 
-export default SignUp; // Ensure this is present
+export default SignUp; 

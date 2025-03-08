@@ -4,8 +4,9 @@ const Job = require("../models/job");
 exports.createJob = async (req, res) => {
   try {
     const { title, description, location, salary } = req.body;
-    const job = new Job({ title, description, location, salary, employer: req.user.id });
-    await job.save();
+    const job = new Job({ title, description, location, salary/*, employer: req.user.id*/ });
+    const jobb=await job.save();
+    console.log(jobb);
     res.status(201).json(job);
   } catch (err) {
     res.status(500).json({ message: "Server Error" });
