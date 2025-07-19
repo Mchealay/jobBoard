@@ -1,12 +1,15 @@
 import React, { useState } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
-const Login = ({ setIsAuthenticated, setUserRole }) => {
+const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
-    password: "",
+    password: ""
   });
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -15,52 +18,78 @@ const Login = ({ setIsAuthenticated, setUserRole }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", formData);
-      localStorage.setItem("token", res.data.token); // Save token to localStorage
-      setIsAuthenticated(true); // Update authentication state
+    setError("");
+    setSubmitting(true);
 
-      // Decode the token to get the user role
-      const payload = JSON.parse(atob(res.data.token.split(".")[1]));
-      setUserRole(payload.user.role);
+    const res = await login(formData.email, formData.password);
+    setSubmitting(false);
 
-      // Redirect based on role
-      if (payload.user.role === "employer") {
-        navigate("/post-job"); // Redirect to Post Job page for employers
+    if (res.success) {
+      if (res.user.role === "employer") {
+        navigate("/dashboard");
+      } else if (res.user.role === "admin") {
+        navigate("/dashboard");
       } else {
-        navigate("/"); // Redirect to home page for job seekers
+        navigate("/");
       }
-    } catch (err) {
-      console.error(err.response?.data?.message || "Login failed");
+    } else {
+      setError(res.message);
     }
   };
 
   return (
-    <div>
-      <h1>Login</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Email</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
+    <div className="main-content">
+      <div className="auth-container glass-panel">
+        <div className="auth-header">
+          <h2>Welcome Back</h2>
+          <p>Login to your JobPortal account</p>
         </div>
-        <div>
-          <label>Password</label>
-          <input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <button type="submit">Login</button>
-      </form>
+
+        {error && <div className="alert alert-error">{error}</div>}
+
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="email">Email Address</label>
+            <input
+              id="email"
+              type="email"
+              name="email"
+              className="form-control"
+              placeholder="name@company.com"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input
+              id="password"
+              type="password"
+              name="password"
+              className="form-control"
+              placeholder="••••••••"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="btn btn-primary"
+            style={{ width: "100%", marginTop: "1rem" }}
+            disabled={submitting}
+          >
+            {submitting ? "Logging in..." : "Login"}
+          </button>
+        </form>
+
+        <p className="auth-footer-link">
+          Don't have an account? <Link to="/signup">Sign Up</Link>
+        </p>
+      </div>
     </div>
   );
 };

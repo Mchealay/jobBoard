@@ -1,14 +1,17 @@
 import React, { useState } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
-const SignUp = () => {
+const Signup = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-    role: "jobseeker",
+    role: "jobseeker"
   });
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const { register } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -17,60 +20,110 @@ const SignUp = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const res = await axios.post("http://localhost:5000/api/auth/register", formData);
-      localStorage.setItem("token", res.data.token); // Save token to localStorage
-      navigate("/"); // Redirect to home page after sign-up
-    } catch (err) {
-      console.error(err.response.data.message);
+    setError("");
+    setSubmitting(true);
+
+    const res = await register(
+      formData.name,
+      formData.email,
+      formData.password,
+      formData.role
+    );
+    setSubmitting(false);
+
+    if (res.success) {
+      if (res.user.role === "employer") {
+        navigate("/dashboard");
+      } else {
+        navigate("/");
+      }
+    } else {
+      setError(res.message);
     }
   };
 
   return (
-    <div>
-      <h1>Sign Up</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Name</label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
+    <div className="main-content">
+      <div className="auth-container glass-panel">
+        <div className="auth-header">
+          <h2>Create Account</h2>
+          <p>Get started with JobPortal today</p>
         </div>
-        <div>
-          <label>Email</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
-          <label>Password</label>
-          <input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
-          <label>Role</label>
-          <select name="role" value={formData.role} onChange={handleChange}>
-            <option value="jobseeker">Job Seeker</option>
-            <option value="employer">Employer</option>
-          </select>
-        </div>
-        <button type="submit">Sign Up</button>
-      </form>
+
+        {error && <div className="alert alert-error">{error}</div>}
+
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="name">Full Name</label>
+            <input
+              id="name"
+              type="text"
+              name="name"
+              className="form-control"
+              placeholder="John Doe"
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="email">Email Address</label>
+            <input
+              id="email"
+              type="email"
+              name="email"
+              className="form-control"
+              placeholder="john@example.com"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input
+              id="password"
+              type="password"
+              name="password"
+              className="form-control"
+              placeholder="••••••••"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="role">I want to join as a</label>
+            <select
+              id="role"
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+            >
+              <option value="jobseeker">Job Seeker (looking for a job)</option>
+              <option value="employer">Employer (posting open roles)</option>
+            </select>
+          </div>
+
+          <button
+            type="submit"
+            className="btn btn-primary"
+            style={{ width: "100%", marginTop: "1rem" }}
+            disabled={submitting}
+          >
+            {submitting ? "Signing up..." : "Sign Up"}
+          </button>
+        </form>
+
+        <p className="auth-footer-link">
+          Already have an account? <Link to="/login">Login</Link>
+        </p>
+      </div>
     </div>
   );
 };
 
-export default SignUp; 
+export default Signup;
